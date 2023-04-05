@@ -1,0 +1,81 @@
+[gd_scene load_steps=10 format=3 uid="uid://vakib76awba7"]
+
+[ext_resource type="Script" path="res://scripts/player.gd" id="1_4gyvh"]
+[ext_resource type="Texture2D" uid="uid://c0chmhlgyhda0" path="res://assets/robot_char.png" id="1_fr7jv"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ni4q2"]
+radius = 5.0
+height = 26.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1yebn"]
+atlas = ExtResource("1_fr7jv")
+region = Rect2(0, 0, 20, 31)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_n33ao"]
+atlas = ExtResource("1_fr7jv")
+region = Rect2(60, 0, 20, 31)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_61ncy"]
+atlas = ExtResource("1_fr7jv")
+region = Rect2(20, 0, 20, 31)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ka6km"]
+atlas = ExtResource("1_fr7jv")
+region = Rect2(40, 0, 20, 31)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mdm26"]
+atlas = ExtResource("1_fr7jv")
+region = Rect2(60, 0, 20, 31)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_7utku"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1yebn")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_n33ao")
+}],
+"loop": true,
+"name": &"jump",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1yebn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_61ncy")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ka6km")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mdm26")
+}],
+"loop": true,
+"name": &"run",
+"speed": 8.0
+}]
+
+[node name="CharacterBody2D" type="CharacterBody2D"]
+floor_constant_speed = true
+floor_max_angle = 1.23395
+floor_snap_length = 5.0
+script = ExtResource("1_4gyvh")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(1, -13)
+shape = SubResource("CapsuleShape2D_ni4q2")
+
+[node name="PlayerSprite" type="AnimatedSprite2D" parent="."]
+unique_name_in_owner = true
+texture_filter = 3
+position = Vector2(0, -15)
+sprite_frames = SubResource("SpriteFrames_7utku")
+animation = &"run"
