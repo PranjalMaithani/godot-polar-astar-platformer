@@ -1,0 +1,141 @@
+@tool
+extends Node2D
+class_name PolarGridScanner
+
+## Specify only if you are using the Godot Tilemap
+@export var tilemap: TileMap
+## Bottom right corner of the grid
+@export var grid_end: Vector2 : set = _set_grid_end
+@export var cell_size: float
+## cell size is divided by this value when scanning
+@export var cell_check_divider: int = 1
+## Physics layer that all obstacle tiles will have
+@export_flags_2d_physics var tile_layer: int
+
+@export var show_grid: bool : set = _set_show_grid
+@export var show_grid_area: bool
+@export var grid_color: Color : set = _set_grid_color
+@export var grid_solid_color: Color : set = _set_grid_solid_color
+
+var is_scanned: bool
+var grid : PolarGridAstar
+
+func _init():
+    pass
+
+func draw_grid():
+    # Bounds
+    var grid_bounds = get_grid_bounds()
+    var grid_bounds_size = grid_bounds.end_position - grid_bounds.start_position
+    var grid_bounds_rect = Rect2(to_local(grid_bounds.start_position), grid_bounds_size)
+    draw_rect(grid_bounds_rect, grid_color, false, 1.0)
+
+    # Tiles
+    for x in grid.x_tiles:
+        for y in grid.y_tiles:
+            var tile_rect_start = grid_bounds.start_position + Vector2(x,y) * cell_size
+            var tile_rect_size = Vector2(cell_size, cell_size)
+            var tile_rect = Rect2(to_local(tile_rect_start), tile_rect_size)
+
+            var tile_data = grid.get_tile(x,y)
+            var is_solid = tile_data.is_solid
+            print("tile data = ", tile_data)
+            print("tile is solid = ", is_solid)
+            print("test val = ", tile_data.test_value)
+            var tile_color = grid_solid_color if is_solid else grid_color
+            draw_rect(tile_rect, tile_color, is_solid, 0.5)
+
+func _draw():
+    if !Engine.is_editor_hint():
+        return
+
+    if(show_grid):
+        var grid_bounds = get_grid_bounds()
+        draw_grid()
+
+func _set_show_grid(value):
+    show_grid = value
+    queue_redraw()
+
+func _set_grid_end(value):
+    grid_end = value
+    queue_redraw()
+
+func _set_grid_color(value):
+    grid_color = value
+    queue_redraw()
+
+func _set_grid_solid_color(value):
+    grid_solid_color = value
+    queue_redraw()
+
+func get_grid_bounds() -> Dictionary:
+    if tilemap:
+        var tilemap_rect = tilemap.get_used_rect()
+        var tilemap_cell_size = tilemap.cell_quadrant_size
+        var start_position := Vector2(tilemap_rect.position * tilemap_cell_size)
+        var end_position := Vector2(tilemap_rect.end * tilemap_cell_size)
+        return {
+            "start_position": start_position,
+            "end_position": end_position,
+        }
+    
+    return {
+        "start_position": transform.origin,
+        "end_position": grid_end,
+    }
+
+func get_number_of_tiles_tilemap():
+    var tilemap_rect = tilemap.get_used_rect()
+    var x_tiles = tilemap_rect.size.x
+    var y_tiles = tilemap_rect.size.y
+    return {  
+		"x": x_tiles,
+		"y": y_tiles,
+	}
+
+func get_number_of_tiles_terrain():
+    return PolarAstarUtils.get_number_of_tiles(position, grid_end, cell_size)
+
+func scan_grid():
+    if(tilemap):
+        cell_size = tilemap.cell_quadrant_size
+    
+    var grid_bounds := get_grid_bounds()
+    var start_position = grid_bounds.start_position
+    var end_position = grid_bounds.end_position
+    var direct_space_state := get_world_2d().direct_space_state
+
+    var number_of_tiles = get_number_of_tiles_tilemap() if tilemap else get_number_of_tiles_terrain()
+    var x_tiles = number_of_tiles.x
+    var y_tiles = number_of_tiles.y
+    grid = PolarGridAstar.new(x_tiles, y_tiles, cell_size, position)
+
+    var shape_parameters := PhysicsShapeQueryParameters2D.new()
+    
+    print("x tiles = ", x_tiles)
+    print("y tiles = ", y_tiles)
+    for x in x_tiles:
+        for y in y_tiles:
+            # TODO: evaluate if using tags would be better instead of mask
+            var tile_position = start_position + (Vector2(x, y) * cell_size)
+            shape_parameters.transform.origin = tile_position
+            shape_parameters.collide_with_bodies = true
+            shape_parameters.collision_mask = tile_layer
+            var rectangle_shape = RectangleShape2D.new()
+            rectangle_shape.size = Vector2(cell_size/cell_check_divider, cell_size/cell_check_divider)
+            shape_parameters.shape = rectangle_shape
+            var shape_hit = direct_space_state.get_rest_info(shape_parameters)
+
+            var is_solid = shape_hit.size() > 0 
+            if(is_solid):
+                print("is solid at ",x," ",y, " POS = ", tile_position)
+            var is_slope = false
+            var tile_properties = {
+                "is_solid": is_solid,
+                "is_slope": is_slope
+            }
+            var tile: PolarTileAstar2d = PolarTileAstar2d.new(tile_properties)
+            grid.set_tile(tile, x, y)
+    
+    queue_redraw()

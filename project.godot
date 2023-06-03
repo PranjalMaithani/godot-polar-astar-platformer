@@ -22,8 +22,9 @@ window/size/viewport_height=720
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/PlatformerAStar/plugin.cfg")
+enabled=PackedStringArray("res://addons/test_plugin/plugin.cfg", "res://addons/PlatformerAStar/plugin.cfg")
 
 [rendering]
 
 renderer/rendering_method="gl_compatibility"
+environment/defaults/default_clear_color=Color(0.27451, 0.27451, 0.266667, 1)
