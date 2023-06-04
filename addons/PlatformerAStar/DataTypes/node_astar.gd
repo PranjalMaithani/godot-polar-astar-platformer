@@ -1,9 +1,8 @@
 extends Node2D
-class_name PolarNodeAstar2d
+const GridAstar = preload("./grid_astar.gd")
 
 var g: int
 var h: int
 var f: int:
     get: return g + h
-var connection: PolarNodeAstar2d
-var tile: PolarGridAstar
+var tile: GridAstar

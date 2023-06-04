@@ -1,6 +1,8 @@
 extends Node2D
-class_name PolarGridAstar
 
+const PolarArray2d = preload("./array2d.gd")
+const TileAstar = preload("./tile_astar.gd")
+# const PolarArray2d = preload("res://addons/PlatformerAStar/DataTypes/array2d.gd")
 ## number of cells in X axis
 var x_tiles: int
 ## number of cells in Y axis
@@ -18,8 +20,8 @@ func _init(x_tiles: int, y_tiles: int, cell_size: int, origin_position: Vector2)
     self.origin_position = origin_position
     grid_array2d = PolarArray2d.new(x_tiles, y_tiles)
 
-func set_tile(tile: PolarTileAstar2d, x: int, y: int):
+func set_tile(tile: TileAstar, x: int, y: int):
     grid_array2d.set_value(tile, x, y)
 
-func get_tile(x: int, y: int) -> PolarTileAstar2d:
+func get_tile(x: int, y: int) -> TileAstar:
     return grid_array2d.get_value(x,y)

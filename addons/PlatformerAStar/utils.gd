@@ -1,6 +1,8 @@
 class_name PolarAstarUtils
 
-static func calculate_distance(first_tile: PolarTileAstar2d, second_tile: PolarTileAstar2d):
+const TileAstar = preload("./DataTypes/grid_astar.gd")
+
+static func calculate_distance(first_tile: TileAstar, second_tile: TileAstar):
     # TODO: return distance considering fall/jump in mind
     var first_vector = Vector2(first_tile.x, first_tile.y)
     var second_vector = Vector2(second_tile.x, second_tile.y)

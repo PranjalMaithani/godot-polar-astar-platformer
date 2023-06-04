@@ -1,4 +1,3 @@
-class_name PolarArray2d
 extends Resource
 
 var grid: Array = []

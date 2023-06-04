@@ -2,24 +2,35 @@
 extends Node2D
 class_name PolarGridScanner
 
+const TileAstar = preload("./DataTypes/tile_astar.gd")
+const GridAstar = preload("./DataTypes/grid_astar.gd")
+
+@export_group("Tilemap")
 ## Specify only if you are using the Godot Tilemap
 @export var tilemap: TileMap
+## tilemap layers to check for custom data
+@export var tilemap_layer : int = 0
+
+@export_group("Non tilemap grid")
 ## Bottom right corner of the grid
 @export var grid_end: Vector2 : set = _set_grid_end
 ## if using a tilemap, cell size is automatically picked from tilemap
 @export var cell_size: float
+
+@export_group("Collision Parameters")
 ## cell size ratio used when scanning for tiles
 @export_range(0.2, 1.0) var cell_size_ratio: float = 1.0
 ## Physics layer that all obstacle tiles will have
 @export_flags_2d_physics var tile_layer: int
 
+@export_group("Visualization")
 @export var show_grid: bool : set = _set_show_grid
 @export var show_grid_area: bool = true : set = _set_show_grid_area
 @export var grid_color: Color = Color(0.45, 0.45, 0.45, 1.0) : set = _set_grid_color 
 @export var grid_solid_color: Color = Color(0.0, 1.0, 0.0, 0.2) : set = _set_grid_solid_color
 
 var is_scanned: bool
-var grid : PolarGridAstar
+var grid : GridAstar
 
 func _init():
     pass
@@ -45,9 +56,7 @@ func draw_grid():
             var tile_rect_start = grid_bounds.start_position + Vector2(x,y) * cell_size + Vector2(cell_offset, cell_offset)
 
             var tile_rect = Rect2(to_local(tile_rect_start), tile_rect_size)
-
-            var tile_data = grid.get_tile(x,y)
-            var draw_solid = tile_data.is_solid && show_grid_area
+            var draw_solid = tile.is_solid && show_grid_area
             var tile_color = grid_solid_color if draw_solid else grid_color
             draw_rect(tile_rect, tile_color, draw_solid, 0.5)
 
@@ -119,7 +128,7 @@ func scan_grid():
     var number_of_tiles = get_number_of_tiles_tilemap() if tilemap else get_number_of_tiles_terrain()
     var x_tiles = number_of_tiles.x
     var y_tiles = number_of_tiles.y
-    grid = PolarGridAstar.new(x_tiles, y_tiles, cell_size, position)
+    grid = GridAstar.new(x_tiles, y_tiles, cell_size, position)
 
     var shape_parameters := PhysicsShapeQueryParameters2D.new()
     
@@ -144,7 +153,10 @@ func scan_grid():
                 "is_slope": is_slope,
                 "position": tile_center
             }
-            var tile: PolarTileAstar2d = PolarTileAstar2d.new(tile_properties)
+            var tile: TileAstar = TileAstar.new(tile_properties)
             grid.set_tile(tile, x, y)
     
     queue_redraw()
+
+func get_pathfinding_grid() -> GridAstar:
+    return grid

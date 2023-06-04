@@ -1,5 +1,4 @@
 extends Resource
-class_name PolarTileAstar2d
 
 var is_solid: bool = false
 var is_slope: bool = false
