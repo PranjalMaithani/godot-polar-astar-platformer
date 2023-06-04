@@ -6,16 +6,17 @@ class_name PolarGridScanner
 @export var tilemap: TileMap
 ## Bottom right corner of the grid
 @export var grid_end: Vector2 : set = _set_grid_end
+## if using a tilemap, cell size is automatically picked from tilemap
 @export var cell_size: float
-## cell size is divided by this value when scanning
-@export var cell_check_divider: int = 1
+## cell size ratio used when scanning for tiles
+@export_range(0.2, 1.0) var cell_size_ratio: float = 1.0
 ## Physics layer that all obstacle tiles will have
 @export_flags_2d_physics var tile_layer: int
 
 @export var show_grid: bool : set = _set_show_grid
-@export var show_grid_area: bool
-@export var grid_color: Color : set = _set_grid_color
-@export var grid_solid_color: Color : set = _set_grid_solid_color
+@export var show_grid_area: bool = true : set = _set_show_grid_area
+@export var grid_color: Color = Color(0.45, 0.45, 0.45, 1.0) : set = _set_grid_color 
+@export var grid_solid_color: Color = Color(0.0, 1.0, 0.0, 0.2) : set = _set_grid_solid_color
 
 var is_scanned: bool
 var grid : PolarGridAstar
@@ -24,6 +25,9 @@ func _init():
     pass
 
 func draw_grid():
+    if(!grid):
+        return
+
     # Bounds
     var grid_bounds = get_grid_bounds()
     var grid_bounds_size = grid_bounds.end_position - grid_bounds.start_position
@@ -33,17 +37,19 @@ func draw_grid():
     # Tiles
     for x in grid.x_tiles:
         for y in grid.y_tiles:
-            var tile_rect_start = grid_bounds.start_position + Vector2(x,y) * cell_size
-            var tile_rect_size = Vector2(cell_size, cell_size)
+            var tile = grid.get_tile(x,y)
+            if(!tile):
+                continue
+            var cell_offset = (1 - cell_size_ratio) * cell_size/2
+            var tile_rect_size = Vector2(cell_size * cell_size_ratio, cell_size * cell_size_ratio)
+            var tile_rect_start = grid_bounds.start_position + Vector2(x,y) * cell_size + Vector2(cell_offset, cell_offset)
+
             var tile_rect = Rect2(to_local(tile_rect_start), tile_rect_size)
 
             var tile_data = grid.get_tile(x,y)
-            var is_solid = tile_data.is_solid
-            print("tile data = ", tile_data)
-            print("tile is solid = ", is_solid)
-            print("test val = ", tile_data.test_value)
-            var tile_color = grid_solid_color if is_solid else grid_color
-            draw_rect(tile_rect, tile_color, is_solid, 0.5)
+            var draw_solid = tile_data.is_solid && show_grid_area
+            var tile_color = grid_solid_color if draw_solid else grid_color
+            draw_rect(tile_rect, tile_color, draw_solid, 0.5)
 
 func _draw():
     if !Engine.is_editor_hint():
@@ -55,6 +61,10 @@ func _draw():
 
 func _set_show_grid(value):
     show_grid = value
+    queue_redraw()
+
+func _set_show_grid_area(value):
+    show_grid_area = value
     queue_redraw()
 
 func _set_grid_end(value):
@@ -90,9 +100,9 @@ func get_number_of_tiles_tilemap():
     var x_tiles = tilemap_rect.size.x
     var y_tiles = tilemap_rect.size.y
     return {  
-		"x": x_tiles,
-		"y": y_tiles,
-	}
+        "x": x_tiles,
+        "y": y_tiles,
+    }
 
 func get_number_of_tiles_terrain():
     return PolarAstarUtils.get_number_of_tiles(position, grid_end, cell_size)
@@ -113,27 +123,26 @@ func scan_grid():
 
     var shape_parameters := PhysicsShapeQueryParameters2D.new()
     
-    print("x tiles = ", x_tiles)
-    print("y tiles = ", y_tiles)
     for x in x_tiles:
         for y in y_tiles:
             # TODO: evaluate if using tags would be better instead of mask
-            var tile_position = start_position + (Vector2(x, y) * cell_size)
-            shape_parameters.transform.origin = tile_position
+            var tile_position = start_position + (Vector2(x, y) * cell_size) # up left corner of tile
+            var tile_center = tile_position + Vector2(cell_size/2, cell_size/2)
+            
+            shape_parameters.transform.origin = tile_center # since rectangle shape 2d size is considered from center
             shape_parameters.collide_with_bodies = true
             shape_parameters.collision_mask = tile_layer
             var rectangle_shape = RectangleShape2D.new()
-            rectangle_shape.size = Vector2(cell_size/cell_check_divider, cell_size/cell_check_divider)
+            rectangle_shape.size = Vector2(cell_size * cell_size_ratio, cell_size * cell_size_ratio)
             shape_parameters.shape = rectangle_shape
             var shape_hit = direct_space_state.get_rest_info(shape_parameters)
 
             var is_solid = shape_hit.size() > 0 
-            if(is_solid):
-                print("is solid at ",x," ",y, " POS = ", tile_position)
             var is_slope = false
             var tile_properties = {
                 "is_solid": is_solid,
-                "is_slope": is_slope
+                "is_slope": is_slope,
+                "position": tile_center
             }
             var tile: PolarTileAstar2d = PolarTileAstar2d.new(tile_properties)
             grid.set_tile(tile, x, y)
