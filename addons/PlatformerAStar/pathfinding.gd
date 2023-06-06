@@ -80,7 +80,7 @@ func find_path(parameters: Dictionary):
                     "g": neighbor_g_cost,
                     "h": neighbor_h_cost
                 })
-                node_grid.set_value(neighbor_node, neighbor_node.x neighbor_node.y)
+                node_grid.set_value(neighbor_node, neighbor_node.x, neighbor_node.y)
             neighbor_nodes = node_grid.get_value(current_node.x, current_node.y).neighbors
         
         var lowest_g_cost = 9999
@@ -90,7 +90,7 @@ func find_path(parameters: Dictionary):
             
             var is_in_open_list = open_list.has(neighbor_node)
             # checking if g cost is less when revisiting this node
-            vra cost_to_neighbor = PolarAstarUtils.calculate_distance(current_tile, neighbor_node.tile)
+            var cost_to_neighbor = PolarAstarUtils.calculate_distance(current_tile, neighbor_node.tile)
             if(!is_in_open_list || cost_to_neighbor < neighbor_node.g):
                 neighbor_node.g = cost_to_neighbor
                 neighbor_node.previous_node = current_node
