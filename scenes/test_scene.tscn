@@ -478,7 +478,7 @@ position = Vector2(-224, -144)
 script = ExtResource("4_fuqrd")
 tilemap = NodePath("../TileMap")
 cell_size = 16.0
-cell_size_ratio = 0.776
+cell_size_ratio = 0.664
 tile_layer = 1
 show_grid = true
 

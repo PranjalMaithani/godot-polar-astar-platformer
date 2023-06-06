@@ -1,12 +1,15 @@
 class_name PolarAstarUtils
 
-const TileAstar = preload("./DataTypes/grid_astar.gd")
+const NodeAstar = preload("./DataTypes/node_astar.gd")
+const PathfindingNode = preload("./DataTypes/pathfinding_node.gd")
+const TileAstar = preload("./DataTypes/tile_astar.gd")
+const GridAstar = preload("./DataTypes/grid_astar.gd")
 
 static func calculate_distance(first_tile: TileAstar, second_tile: TileAstar):
     # TODO: return distance considering fall/jump in mind
-    var first_vector = Vector2(first_tile.x, first_tile.y)
-    var second_vector = Vector2(second_tile.x, second_tile.y)
-    return first_vector.distance_to(second_vector)
+    var first_position = Vector2(first_tile.x, first_tile.y)
+    var second_position = Vector2(second_tile.x, second_tile.y)
+    return first_position.distance_to(second_position)
 
 static func get_number_of_tiles(start_position: Vector2, end_position: Vector2, cell_size: float):
     var x_tiles := floor(abs(end_position.x - start_position.x)/cell_size)
@@ -27,3 +30,59 @@ static func load_editor_values(obj : Object) -> void:
                 obj.set(prop_name, obj.get_node(prop_value))
             else:
                 push_error("unknown type:", prop_value)
+
+static func calculate_path(end_node: NodeAstar) -> Array[PathfindingNode]:
+    var path: Array[PathfindingNode] = []
+    var end_pathfinding_node = PathfindingNode.new(end_node)
+    path.append(end_node)
+    var current_node = end_node
+    while(current_node.previous_node):
+        var previous_pathfinding_node = PathfindingNode.new(current_node.previous_node)
+        path.append(previous_pathfinding_node)
+        current_node = current_node.previous_node
+    path.reverse()
+    return path
+
+static func get_neighbors(tile: TileAstar, grid: GridAstar) -> Array[TileAstar]:
+    var neighbors: Array[TileAstar] = []
+    var is_grounded = get_on_ground(tile, grid)
+    var down_tile = grid.get_tile(tile.x, tile.y - 1)
+    var up_tile = grid.get_tile(tile.x, tile.y + 1)
+
+    # Left
+    var left_tile = grid.get_tile(tile.x - 1, tile.y)
+    var is_left_tile_grounded = get_on_ground(left_tile, grid)
+
+    # left - horizontal
+    if(tile.x - 1 >= 0 && is_left_tile_grounded):
+        neighbors.append(left_tile)
+    
+    # left - down
+    if(tile.y - 1 >= 0 && !is_left_tile_grounded && !down_tile.is_solid):
+        neighbors.append(grid.get_tile(tile.x - 1, tile.y - 1))
+    
+    # left - up
+    if(tile.y + 1 < grid.y_tiles && !up_tile.is_solid):
+        neighbors.append(grid.get_tile(tile.x - 1, tile.y + 1))
+
+    # Right
+    var right_tile = grid.get_tile(tile.x + 1, tile.y)
+    var is_right_tile_grounded = get_on_ground(right_tile, grid)
+
+    # right - horizontal
+    if(tile.x + 1 >= 0 && is_right_tile_grounded):
+        neighbors.append(right_tile)
+    
+    # right - down
+    if(tile.y + 1 >= 0 && !is_right_tile_grounded && !down_tile.is_solid):
+        neighbors.append(grid.get_tile(tile.x - 1, tile.y - 1))
+    
+    # right - up
+    if(tile.y + 1 < grid.y_tiles && !up_tile.is_solid):
+        neighbors.append(grid.get_tile(tile.x - 1, tile.y + 1))
+
+    return neighbors
+
+
+static func get_on_ground(tile: TileAstar, grid: GridAstar) -> bool:
+    return tile.y >= 1 && grid.get_tile(tile.x, tile.y - 1).is_solid

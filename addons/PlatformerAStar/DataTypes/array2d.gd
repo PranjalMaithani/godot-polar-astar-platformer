@@ -1,5 +1,3 @@
-extends Resource
-
 var grid: Array = []
 var grid_width: int
 var grid_height: int

@@ -151,7 +151,9 @@ func scan_grid():
             var tile_properties = {
                 "is_solid": is_solid,
                 "is_slope": is_slope,
-                "position": tile_center
+                "position": tile_center,
+                "x": x,
+                "y": y,
             }
             var tile: TileAstar = TileAstar.new(tile_properties)
             grid.set_tile(tile, x, y)
