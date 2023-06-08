@@ -32,8 +32,9 @@ const GridAstar = preload("./DataTypes/grid_astar.gd")
 var is_scanned: bool
 var grid : GridAstar
 
-func _init():
-    pass
+func _ready():
+    if(!grid):
+        scan_grid()
 
 func draw_grid():
     if(!grid):
@@ -161,4 +162,7 @@ func scan_grid():
     queue_redraw()
 
 func get_pathfinding_grid() -> GridAstar:
+    if(!grid):
+        scan_grid()
+
     return grid

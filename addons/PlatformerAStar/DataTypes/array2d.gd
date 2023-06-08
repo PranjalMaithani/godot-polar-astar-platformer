@@ -15,4 +15,7 @@ func set_value(value, x: int, y: int):
     grid[x][y] = value
 
 func get_value(x: int, y: int):
+    if(x < 0 || y < 0 || x >= grid_width || y >= grid_height):
+        return null
+
     return grid[x][y]

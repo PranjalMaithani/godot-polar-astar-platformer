@@ -24,7 +24,7 @@ func set_tile(tile: TileAstar, x: int, y: int):
 func get_tile(x: int, y: int) -> TileAstar:
     return grid_array2d.get_value(x,y)
 
-func get_xy_from_position(position: Vector3):
+func get_xy_from_position(position):
     var x = floori((position.x - origin_position.x)/cell_size)
     var y = floori((position.y - origin_position.y)/cell_size)
     return {

@@ -18,10 +18,7 @@ var previous_node: NodeAstar
 var metadata: Dictionary
 var is_on_slope: bool
 
-var neighbors: NodeAstar
+var neighbors: Array[NodeAstar] = []
 
 func _init(properties):
-    g = properties.g
-    h = properties.h
     tile = properties.tile
-    previous_node = properties.previous_node
