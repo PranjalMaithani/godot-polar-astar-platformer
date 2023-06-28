@@ -15,9 +15,9 @@ static func get_number_of_tiles(start_position: Vector2, end_position: Vector2, 
     var x_tiles := floor(abs(end_position.x - start_position.x)/cell_size)
     var y_tiles := floor(abs(end_position.y - start_position.y)/cell_size)
     return {  
-		"x": x_tiles,
-		"y": y_tiles,
-	}
+        "x": x_tiles,
+        "y": y_tiles,
+    }
 
 # Temporary fix as nodes are being returned as null in tool scripts in Godot 4
 # https://github.com/godotengine/godot/issues/74141
@@ -43,43 +43,57 @@ static func calculate_path(end_node: NodeAstar) -> Array[PathfindingNode]:
     path.reverse()
     return path
 
-static func get_neighbors(tile: TileAstar, grid: GridAstar) -> Array[TileAstar]:
+static func get_neighbors(tile: TileAstar, grid: GridAstar, character_config: Dictionary) -> Array[TileAstar]:
+    #TODO: handle for different sized characters
     var neighbors: Array[TileAstar] = []
+    var is_flying = character_config.flying if character_config.get("flying") else false
     var is_grounded = get_on_ground(tile, grid)
+
     var down_tile = grid.get_tile(tile.x, tile.y - 1)
     var up_tile = grid.get_tile(tile.x, tile.y + 1)
+    var down_left_tile = grid.get_tile(tile.x - 1, tile.y - 1)
+    var down_right_tile = grid.get_tile(tile.x + 1, tile.y - 1)
 
-    # Left
+    # category: Left
     var left_tile = grid.get_tile(tile.x - 1, tile.y)
     var is_left_tile_grounded = get_on_ground(left_tile, grid)
 
     # left - horizontal
-    if(tile.x - 1 >= 0 && is_left_tile_grounded):
+    if(tile.x - 1 >= 0 && (is_left_tile_grounded || is_flying)):
         neighbors.append(left_tile)
     
-    # left - down
-    if(tile.y - 1 >= 0 && !is_left_tile_grounded && !down_tile.is_solid):
+    # left - down (slopes)
+    if(tile.y - 1 >= 0 && (
+        is_flying || (down_left_tile.is_slope && !left_tile.is_solid))
+    ):
         neighbors.append(grid.get_tile(tile.x - 1, tile.y - 1))
     
     # left - up
-    if(tile.y + 1 < grid.y_tiles && !up_tile.is_solid):
+    if(tile.y + 1 < grid.y_tiles && is_flying && !up_tile.is_solid && !left_tile.is_solid):
         neighbors.append(grid.get_tile(tile.x - 1, tile.y + 1))
 
-    # Right
+    # category: Right
     var right_tile = grid.get_tile(tile.x + 1, tile.y)
     var is_right_tile_grounded = get_on_ground(right_tile, grid)
 
     # right - horizontal
-    if(tile.x + 1 >= 0 && is_right_tile_grounded):
+    if(tile.x + 1 >= 0 && (is_right_tile_grounded || is_flying)):
         neighbors.append(right_tile)
     
-    # right - down
-    if(tile.y + 1 >= 0 && !is_right_tile_grounded && !down_tile.is_solid):
-        neighbors.append(grid.get_tile(tile.x - 1, tile.y - 1))
+    # right - down (slopes)
+    if(tile.y + 1 >= 0 && \
+        (is_flying || (down_right_tile.is_slope && !right_tile.is_solid))
+    ):
+        neighbors.append(grid.get_tile(tile.x + 1, tile.y - 1))
     
     # right - up
     if(tile.y + 1 < grid.y_tiles && !up_tile.is_solid):
-        neighbors.append(grid.get_tile(tile.x - 1, tile.y + 1))
+        neighbors.append(grid.get_tile(tile.x + 1, tile.y + 1))
+
+    # category - up & down
+    if(is_flying):
+        neighbors.append(grid.get_tile(tile.x, tile.y + 1))
+        neighbors.append(grid.get_tile(tile.x, tile.y - 1))
 
     return neighbors
 

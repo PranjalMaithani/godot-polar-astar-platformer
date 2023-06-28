@@ -6,5 +6,5 @@ var position
 
 func _init(node: NodeAstar):
     metadata = node.metadata
-    is_on_slope = node.tile.is_on_slope
+    is_on_slope = node.tile.is_slope
     position = node.position

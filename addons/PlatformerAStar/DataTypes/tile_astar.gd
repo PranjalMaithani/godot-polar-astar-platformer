@@ -5,7 +5,8 @@ var is_slope: bool = false
 var position: Vector2 # cache position
 var x
 var y
-var neighbors # caching neighbours
+## caching neighbours based on character config. Neighbors can be different for flying/non-flying characters etc.
+var neighbors_map: Dictionary = {} 
 var metadata: Dictionary
 
 enum OneWayDirection { UP }
@@ -18,9 +19,9 @@ func _init(properties: Dictionary):
     x = properties.x
     y = properties.y
 
-func get_neighbors(grid: GridAstar):
-    if(neighbors):
-        return neighbors
-    var updated_neighbors = PolarAstarUtils.get_neighbors(self, grid)
-    neighbors = updated_neighbors
-    return neighbors
+func get_neighbors(grid: GridAstar, character_config: Dictionary):
+    if(neighbors_map.has(character_config.name)):
+        return neighbors_map[character_config.name]
+    var updated_neighbors = PolarAstarUtils.get_neighbors(self, grid, character_config)
+    neighbors_map[character_config.name] = updated_neighbors
+    return neighbors_map[character_config.name]

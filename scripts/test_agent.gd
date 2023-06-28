@@ -15,5 +15,3 @@ func _ready():
         "start_position": position,
         "end_position": target_node.position
     })
-    print("pathfinding array = ")
-    print(pathfinding_array)

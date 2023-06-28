@@ -9,7 +9,11 @@ const PathfindingNode = preload("./DataTypes/pathfinding_node.gd")
 
 var grid: GridAstar
 var node_grid: Array2d
-var character_config: Dictionary #TODO: create character config resource class
+var character_config: Dictionary = {
+    "name": "default",
+    "flying": true,
+    "size": Vector2(1,1)
+} #TODO: create character config resource class
 
 func _init(parameters: Dictionary):
     grid = parameters.grid
@@ -17,7 +21,7 @@ func _init(parameters: Dictionary):
     if(parameters.get("character_config")):
         character_config = parameters.character_config
 
-func get_lower_f_cost_node(first: NodeAstar, second: NodeAstar):
+func get_lowest_f_cost_node(first: NodeAstar, second: NodeAstar):
     if(second.f < first.f || (second.f == first.f && second.h < first.h)):
         return second
     return first
@@ -32,10 +36,6 @@ func find_path(parameters: Dictionary):
     var end_xy = grid.get_xy_from_position(end_position)
     var end_x = end_xy.x
     var end_y = end_xy.y
-
-    print("start x y = ", start_x, " ", start_y)
-    print("end x y = ", end_x, " ", end_y)
-    print("grid bounds = ", grid.x_tiles, " ",grid.y_tiles)
 
     if(start_x < 0 || start_y < 0 || start_x >= grid.x_tiles || start_y >= grid.y_tiles || \
        end_x < 0 || end_y < 0 || end_x >= grid.x_tiles || end_y >= grid.y_tiles):
@@ -57,6 +57,9 @@ func find_path(parameters: Dictionary):
             "h": 0,
             "tile": end_tile,
         })
+    
+    node_grid.set_value(start_node, start_node.x, start_node.y)
+    node_grid.set_value(end_node, end_node.x, end_node.y)
     start_node.h = PolarAstarUtils.calculate_distance(start_tile, end_tile)
     
     var open_list: Array[NodeAstar] = [start_node]
@@ -64,19 +67,15 @@ func find_path(parameters: Dictionary):
 
     while (open_list.size() > 0):
         # get lowest F cost node and mark it as current
-        var current_node: NodeAstar = open_list.reduce(get_lower_f_cost_node)
+        var current_node: NodeAstar = open_list.reduce(get_lowest_f_cost_node)
         if(current_node == end_node):
-            print(("FOUND END NODE"))
             return PolarAstarUtils.calculate_path(current_node)
-        if(closed_list.has(current_node)):
-            continue
         
         open_list.erase(current_node)
         closed_list.append(current_node)
         
-        var current_tile = current_node.tile
-        var neighbor_tiles = current_tile.get_neighbors(grid)
-        print("neighbor tiles = ", neighbor_tiles)
+        var current_tile := current_node.tile
+        var neighbor_tiles = current_tile.get_neighbors(grid, character_config)
 
         var cached_current_node = node_grid.get_value(current_node.x, current_node.y)
         if(!cached_current_node):
@@ -84,11 +83,12 @@ func find_path(parameters: Dictionary):
         
         var neighbor_nodes = current_node.neighbors if current_node.neighbors else null
         
+        # caching neighbor nodes
         if(!neighbor_nodes):
             for neighbor_tile in neighbor_tiles:
-                var neighbor_g_cost = PolarAstarUtils.calculate_distance(current_tile, neighbor_tile)
-                var neighbor_h_cost = PolarAstarUtils.calculate_distance(neighbor_tile, end_tile)
                 var cached_neighbor_node = node_grid.get_value(neighbor_tile.x, neighbor_tile.y)
+                if(closed_list.has(cached_neighbor_node)):
+                    continue
                 var neighbor_node: NodeAstar = cached_neighbor_node if cached_neighbor_node else null
                 if(!neighbor_node):
                     neighbor_node = NodeAstar.new({
@@ -98,23 +98,21 @@ func find_path(parameters: Dictionary):
                 
                 current_node.neighbors.append(neighbor_node)
             neighbor_nodes = current_node.neighbors
-        
-        print("neighbor nodes = ", neighbor_nodes)
+
         var lowest_g_cost = 9999
         for neighbor_node in neighbor_nodes:
-            if(neighbor_node.tile.is_solid):
+            if(neighbor_node.tile.is_solid && !neighbor_node.tile.is_slope):
                 continue
             
             var is_in_open_list = open_list.has(neighbor_node)
             # checking if g cost is less when re-visiting this node
-            var cost_to_neighbor = PolarAstarUtils.calculate_distance(current_tile, neighbor_node.tile)
+            var cost_to_neighbor = current_node.g + PolarAstarUtils.calculate_distance(current_tile, neighbor_node.tile)
             if(!is_in_open_list || cost_to_neighbor < neighbor_node.g):
                 neighbor_node.g = cost_to_neighbor
                 neighbor_node.previous_node = current_node
                 if(!is_in_open_list):
                     neighbor_node.h = PolarAstarUtils.calculate_distance(neighbor_node.tile, end_tile)
                     open_list.append(neighbor_node)
-        print("open list at end = ", open_list)
-        return null # TEMP for testing one iteration of loop
+        # return null # TEMP for testing one iteration of loop
                     
     return null
