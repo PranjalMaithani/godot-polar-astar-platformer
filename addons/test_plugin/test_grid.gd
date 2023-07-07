@@ -18,11 +18,7 @@ func print_grid_bounds():
     var start_positon = tilemap_rect.position
     # bottom right
     var end_position = tilemap_rect.end
-    print("start ",start_positon)
-    print("end ", end_position)
     var tiles_count = PolarAstarUtils.get_number_of_tiles(start_positon, end_position, 1)
-    print("number of X tiles = ", tiles_count.x)
-    print("number of Y tiles = ", tiles_count.y)
 
 func check_rect_collision():
     var shape_parameters := PhysicsShapeQueryParameters2D.new()
@@ -37,4 +33,3 @@ func check_rect_collision():
     var shape_hit = direct_space_state.get_rest_info(shape_parameters)
 
     var is_solid = shape_hit.size() > 0
-    print("is solid at tile = ",is_solid)

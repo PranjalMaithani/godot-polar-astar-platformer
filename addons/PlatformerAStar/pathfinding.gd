@@ -29,6 +29,7 @@ func get_lowest_f_cost_node(first: NodeAstar, second: NodeAstar):
 func find_path(parameters: Dictionary):
     var start_position = parameters.start_position
     var end_position = parameters.end_position
+    var should_draw_path = parameters.get("should_draw_path")
 
     var start_xy = grid.get_xy_from_position(start_position)
     var start_x = start_xy.x
@@ -113,6 +114,5 @@ func find_path(parameters: Dictionary):
                 if(!is_in_open_list):
                     neighbor_node.h = PolarAstarUtils.calculate_distance(neighbor_node.tile, end_tile)
                     open_list.append(neighbor_node)
-        # return null # TEMP for testing one iteration of loop
                     
     return null

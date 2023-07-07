@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://byycst3o22hhh"]
+[gd_scene load_steps=11 format=3 uid="uid://byycst3o22hhh"]
 
 [ext_resource type="Texture2D" uid="uid://dxdyrhvhpcntr" path="res://assets/marble_packed.png" id="1_0e1uf"]
 [ext_resource type="PackedScene" uid="uid://vakib76awba7" path="res://entities/player.tscn" id="2_bgpue"]
@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://d21uk45ym24rd" path="res://assets/Burst.png" id="5_551cu"]
 [ext_resource type="Script" path="res://addons/test_plugin/test_grid.gd" id="6_hq160"]
 [ext_resource type="Script" path="res://scripts/test_agent.gd" id="7_3qqmp"]
+[ext_resource type="Script" path="res://addons/PlatformerAStar/draw_pathfinding.gd" id="8_loqto"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_lc7sn"]
 texture = ExtResource("1_0e1uf")
@@ -502,6 +503,10 @@ position = Vector2(360, -72)
 script = ExtResource("7_3qqmp")
 grid_scanner = NodePath("../GridScanner")
 target_node = NodePath("../Target Node")
+
+[node name="PathfindingVisual" type="Node2D" parent="Test agent"]
+position = Vector2(-360, 72)
+script = ExtResource("8_loqto")
 
 [node name="Target Node" type="Node2D" parent="."]
 position = Vector2(216, 56)
