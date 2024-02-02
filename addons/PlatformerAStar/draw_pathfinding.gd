@@ -25,6 +25,7 @@ func draw_path(pathfinding_nodes_array) -> void:
         
     points_to_draw = pathfinding_nodes_array
     should_draw_path = true
+    queue_redraw()
 
 func disable_drawing() -> void:
     should_draw_path = false

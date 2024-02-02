@@ -19,3 +19,9 @@ func get_value(x: int, y: int):
         return null
 
     return grid[x][y]
+
+func reset_values(reset_value):
+    for x in grid_width:
+        var column_array = []
+        for y in grid_height:
+            grid[x][y] = reset_value;

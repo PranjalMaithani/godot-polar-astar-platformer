@@ -92,7 +92,7 @@ func _set_grid_solid_color(value):
 func get_grid_bounds() -> Dictionary:
     if tilemap:
         var tilemap_rect = tilemap.get_used_rect()
-        var tilemap_cell_size = tilemap.cell_quadrant_size
+        var tilemap_cell_size = tilemap.tile_set.tile_size.x #assuming tiles to be in square ratio
         var start_position := Vector2(tilemap_rect.position * tilemap_cell_size)
         var end_position := Vector2(tilemap_rect.end * tilemap_cell_size)
         return {
@@ -101,7 +101,7 @@ func get_grid_bounds() -> Dictionary:
         }
     
     return {
-        "start_position": transform.origin,
+        "start_position": position,
         "end_position": grid_end,
     }
 
@@ -119,7 +119,7 @@ func get_number_of_tiles_terrain():
 
 func scan_grid():
     if(tilemap):
-        cell_size = tilemap.cell_quadrant_size
+        cell_size = tilemap.tile_set.tile_size.x #assuming tiles to be in square ratio
     
     var grid_bounds := get_grid_bounds()
     var start_position = grid_bounds.start_position
@@ -129,6 +129,7 @@ func scan_grid():
     var number_of_tiles = get_number_of_tiles_tilemap() if tilemap else get_number_of_tiles_terrain()
     var x_tiles = number_of_tiles.x
     var y_tiles = number_of_tiles.y
+    var grid_origin = grid_bounds.start_position if tilemap else position
     grid = GridAstar.new(x_tiles, y_tiles, cell_size, position)
 
     var shape_parameters := PhysicsShapeQueryParameters2D.new()

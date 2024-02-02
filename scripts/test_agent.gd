@@ -11,7 +11,8 @@ func _ready():
         "grid": grid
     }
     pathfinding = PolarPathfinding.new(pathfinding_parameters)
-    
+
+func _process(delta):
     var pathfinding_array = pathfinding.find_path({
         "start_position": position,
         "end_position": target_node.position

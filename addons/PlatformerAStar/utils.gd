@@ -31,14 +31,14 @@ static func load_editor_values(obj : Object) -> void:
             else:
                 push_error("unknown type:", prop_value)
 
-static func calculate_path(end_node: NodeAstar) -> Array[PathfindingNode]:
+static func calculate_path(path_end_node: NodeAstar) -> Array[PathfindingNode]:
     var path: Array[PathfindingNode] = []
-    var end_pathfinding_node = PathfindingNode.new(end_node)
+    var end_node = PathfindingNode.new(path_end_node)
     path.append(end_node)
-    var current_node = end_node
+    var current_node: NodeAstar = path_end_node
     while(current_node.previous_node):
-        var previous_pathfinding_node = PathfindingNode.new(current_node.previous_node)
-        path.append(previous_pathfinding_node)
+        var previous_node = PathfindingNode.new(current_node.previous_node)
+        path.append(previous_node)
         current_node = current_node.previous_node
     path.reverse()
     return path

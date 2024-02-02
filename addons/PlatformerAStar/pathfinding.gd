@@ -27,9 +27,9 @@ func get_lowest_f_cost_node(first: NodeAstar, second: NodeAstar):
     return first
 
 func find_path(parameters: Dictionary):
+    node_grid.reset_values(null);
     var start_position = parameters.start_position
     var end_position = parameters.end_position
-    var should_draw_path = parameters.get("should_draw_path")
 
     var start_xy = grid.get_xy_from_position(start_position)
     var start_x = start_xy.x
@@ -49,16 +49,13 @@ func find_path(parameters: Dictionary):
         return null
  
     var start_node = NodeAstar.new({
-            "g": 0,
-            "h": 0, # being assigned afterwards
             "tile": start_tile
         })
     var end_node = NodeAstar.new({
-            "g": 0, # being assigned afterwards
-            "h": 0,
             "tile": end_tile,
         })
     
+    #TODO: handle nodes for more than 1 scenario. Current implementation is for flying units only
     node_grid.set_value(start_node, start_node.x, start_node.y)
     node_grid.set_value(end_node, end_node.x, end_node.y)
     start_node.h = PolarAstarUtils.calculate_distance(start_tile, end_tile)
