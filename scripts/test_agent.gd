@@ -12,7 +12,7 @@ func _ready():
     }
     pathfinding = PolarPathfinding.new(pathfinding_parameters)
 
-func _process(delta):
+func _process(_delta):
     var pathfinding_array = pathfinding.find_path({
         "start_position": position,
         "end_position": target_node.position

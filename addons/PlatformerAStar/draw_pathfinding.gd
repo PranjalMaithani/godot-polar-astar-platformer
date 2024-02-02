@@ -1,4 +1,4 @@
-extends CanvasItem
+extends Node2D
 class_name PolarPathFindingVisual
 
 const PathfindingNode = preload("./DataTypes/pathfinding_node.gd")
@@ -16,7 +16,9 @@ func draw_path_execute():
     var previous_point = points_to_draw[0]
     for i in range(1, array_length - 1):
         var next_point = points_to_draw[i]
-        draw_line(previous_point.position, next_point.position, Color.GREEN, 1.0)
+        draw_line(to_local(previous_point.position), \
+                  to_local(next_point.position), \
+                  Color.GREEN, 1.0)
         previous_point = next_point
 
 func draw_path(pathfinding_nodes_array) -> void:

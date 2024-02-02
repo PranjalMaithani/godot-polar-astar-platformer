@@ -508,8 +508,7 @@ grid_scanner = NodePath("../GridScanner")
 target_node = NodePath("../Player")
 
 [node name="PathfindingVisual" type="Node2D" parent="Test agent"]
-position = Vector2(-360, 72)
 script = ExtResource("8_loqto")
 
 [node name="Target Node" type="Node2D" parent="."]
-position = Vector2(-217, -120)
+position = Vector2(173, -54)
