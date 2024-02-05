@@ -63,8 +63,9 @@ static func get_neighbors(tile: TileAstar, grid: GridAstar, character_config: Di
         neighbors.append(left_tile)
     
     # left - down (slopes)
-    if(tile.y - 1 >= 0 && (
-        is_flying || (down_left_tile.is_slope && !left_tile.is_solid))
+    if(tile.y - 1 >= 0 && \
+        !left_tile.is_solid && \
+        (is_flying || down_left_tile.is_slope)
     ):
         neighbors.append(grid.get_tile(tile.x - 1, tile.y - 1))
     
@@ -81,8 +82,9 @@ static func get_neighbors(tile: TileAstar, grid: GridAstar, character_config: Di
         neighbors.append(right_tile)
     
     # right - down (slopes)
-    if(tile.y + 1 >= 0 && \
-        (is_flying || (down_right_tile.is_slope && !right_tile.is_solid))
+    if(tile.y - 1 >= 0 && \
+        !right_tile.is_solid && \
+        (is_flying || down_right_tile.is_slope)
     ):
         neighbors.append(grid.get_tile(tile.x + 1, tile.y - 1))
     
@@ -91,8 +93,10 @@ static func get_neighbors(tile: TileAstar, grid: GridAstar, character_config: Di
         neighbors.append(grid.get_tile(tile.x + 1, tile.y + 1))
 
     # category - up & down
-    if(is_flying):
+    if(is_flying && tile.y + 1 < grid.y_tiles):
         neighbors.append(grid.get_tile(tile.x, tile.y + 1))
+    
+    if(is_flying && tile.y - 1 >= 0):
         neighbors.append(grid.get_tile(tile.x, tile.y - 1))
 
     return neighbors

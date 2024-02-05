@@ -34,6 +34,7 @@ var grid : GridAstar
 
 func _ready():
     if(!grid):
+        await get_tree().create_timer(1).timeout
         scan_grid()
 
 func draw_grid():
@@ -59,11 +60,15 @@ func draw_grid():
             var tile_rect = Rect2(to_local(tile_rect_start), tile_rect_size)
             var draw_solid = tile.is_solid && show_grid_area
             var tile_color = grid_solid_color if draw_solid else grid_color
-            draw_rect(tile_rect, tile_color, draw_solid, 0.5)
+            # to prevent debugger from getting warnings noise for - width has no effect when draw_solid is true
+            if(draw_solid):
+                draw_rect(tile_rect, tile_color, draw_solid)
+            else:
+                draw_rect(tile_rect, tile_color, draw_solid, 0.5)
 
 func _draw():
-    if !Engine.is_editor_hint():
-        return
+    # if !Engine.is_editor_hint():
+    #     return
 
     if(show_grid):
         var grid_bounds = get_grid_bounds()
@@ -148,7 +153,9 @@ func scan_grid():
             shape_parameters.shape = rectangle_shape
             var shape_hit = direct_space_state.get_rest_info(shape_parameters)
 
-            var is_solid = shape_hit.size() > 0 
+            var is_solid = shape_hit.size() > 0
+            # if(is_solid):
+            #     print("found solid at ", tile_center, " for  XY = ", x, ", ", y)
             var is_slope = false
             var tile_properties = {
                 "is_solid": is_solid,
@@ -163,7 +170,4 @@ func scan_grid():
     queue_redraw()
 
 func get_pathfinding_grid() -> GridAstar:
-    if(!grid):
-        scan_grid()
-
     return grid

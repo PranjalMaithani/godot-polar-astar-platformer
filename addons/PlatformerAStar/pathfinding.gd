@@ -21,10 +21,12 @@ func _init(parameters: Dictionary):
     if(parameters.get("character_config")):
         character_config = parameters.character_config
 
-func get_lowest_f_cost_node(first: NodeAstar, second: NodeAstar):
-    if(second.f < first.f || (second.f == first.f && second.h < first.h)):
-        return second
-    return first
+func get_lowest_f_cost_node(prev: NodeAstar, current: NodeAstar):
+    if(prev == null):
+        return current
+    if(current.f < prev.f || (current.f == prev.f && current.h < prev.h)):
+        return current
+    return prev
 
 func find_path(parameters: Dictionary):
     node_grid.reset_values(null);
@@ -54,6 +56,9 @@ func find_path(parameters: Dictionary):
     var end_node = NodeAstar.new({
             "tile": end_tile,
         })
+
+    # print("start x y = ", start_x, ", ", start_y )
+    # print("end x y = ", end_x, ", ", end_y )
     
     #TODO: handle nodes for more than 1 scenario. Current implementation is for flying units only
     node_grid.set_value(start_node, start_node.x, start_node.y)
@@ -65,7 +70,8 @@ func find_path(parameters: Dictionary):
 
     while (open_list.size() > 0):
         # get lowest F cost node and mark it as current
-        var current_node: NodeAstar = open_list.reduce(get_lowest_f_cost_node)
+        var current_node: NodeAstar = open_list.reduce(get_lowest_f_cost_node, null)
+        
         if(current_node == end_node):
             return PolarAstarUtils.calculate_path(current_node)
         
@@ -77,10 +83,11 @@ func find_path(parameters: Dictionary):
 
         var cached_current_node = node_grid.get_value(current_node.x, current_node.y)
         if(!cached_current_node):
+            print("current node was not cached ")
             node_grid.set_value(current_node, current_node.x, current_node.y)
         
-        var neighbor_nodes = current_node.neighbors if current_node.neighbors else null
-        
+        var neighbor_nodes = current_node.neighbors if current_node.neighbors else []
+
         # caching neighbor nodes
         if(!neighbor_nodes):
             for neighbor_tile in neighbor_tiles:
@@ -97,7 +104,6 @@ func find_path(parameters: Dictionary):
                 current_node.neighbors.append(neighbor_node)
             neighbor_nodes = current_node.neighbors
 
-        var lowest_g_cost = 9999
         for neighbor_node in neighbor_nodes:
             if(neighbor_node.tile.is_solid && !neighbor_node.tile.is_slope):
                 continue
