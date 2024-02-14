@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://byycst3o22hhh"]
+[gd_scene load_steps=12 format=3 uid="uid://byycst3o22hhh"]
 
 [ext_resource type="Texture2D" uid="uid://dxdyrhvhpcntr" path="res://assets/marble_packed.png" id="1_0e1uf"]
 [ext_resource type="PackedScene" uid="uid://vakib76awba7" path="res://entities/player.tscn" id="2_bgpue"]
@@ -8,6 +8,7 @@
 [ext_resource type="Script" path="res://addons/test_plugin/test_grid.gd" id="6_hq160"]
 [ext_resource type="Script" path="res://scripts/test_agent.gd" id="7_3qqmp"]
 [ext_resource type="Script" path="res://addons/PlatformerAStar/draw_pathfinding.gd" id="8_loqto"]
+[ext_resource type="Script" path="res://addons/PlatformerAStar/pathfinding.gd" id="9_7335h"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_lc7sn"]
 texture = ExtResource("1_0e1uf")
@@ -501,14 +502,23 @@ script = ExtResource("6_hq160")
 tilemap = NodePath("../TileMap")
 tile_layer = 1
 
-[node name="Test agent" type="Node2D" parent="." node_paths=PackedStringArray("grid_scanner", "target_node")]
+[node name="Test agent" type="Node2D" parent="." node_paths=PackedStringArray("target_node")]
 position = Vector2(360, -72)
 script = ExtResource("7_3qqmp")
-grid_scanner = NodePath("../GridScanner")
 target_node = NodePath("../Player")
 
 [node name="PathfindingVisual" type="Node2D" parent="Test agent"]
 script = ExtResource("8_loqto")
+
+[node name="Pathfinding" type="Node" parent="Test agent" node_paths=PackedStringArray("grid_scanner")]
+unique_name_in_owner = true
+script = ExtResource("9_7335h")
+grid_scanner = NodePath("../../GridScanner")
+
+[node name="Timer" type="Timer" parent="Test agent/Pathfinding"]
+unique_name_in_owner = true
+wait_time = 0.35
+autostart = true
 
 [node name="Target Node" type="Node2D" parent="."]
 position = Vector2(173, -54)

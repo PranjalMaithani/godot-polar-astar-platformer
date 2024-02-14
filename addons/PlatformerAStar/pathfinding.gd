@@ -1,4 +1,5 @@
 @tool
+extends Node
 class_name PolarPathfinding
 
 const Array2d = preload("./DataTypes/array2d.gd")
@@ -6,7 +7,9 @@ const NodeAstar = preload("./DataTypes/node_astar.gd")
 const TileAstar = preload("./DataTypes/tile_astar.gd")
 const GridAstar = preload("./DataTypes/grid_astar.gd")
 const PathfindingNode = preload("./DataTypes/pathfinding_node.gd")
+const GridScanner = preload("./grid_scanner.gd")
 
+@export var grid_scanner: GridScanner
 var grid: GridAstar
 var node_grid: Array2d
 var character_config: Dictionary = {
@@ -15,11 +18,10 @@ var character_config: Dictionary = {
     "size": Vector2(1,1)
 } #TODO: create character config resource class
 
-func _init(parameters: Dictionary):
-    grid = parameters.grid
+func _ready():
+    await get_tree().create_timer(2).timeout
+    grid = grid_scanner.get_pathfinding_grid()
     node_grid = Array2d.new(grid.x_tiles, grid.y_tiles)
-    if(parameters.get("character_config")):
-        character_config = parameters.character_config
 
 func get_lowest_f_cost_node(prev: NodeAstar, current: NodeAstar):
     if(prev == null):
@@ -28,8 +30,13 @@ func get_lowest_f_cost_node(prev: NodeAstar, current: NodeAstar):
         return current
     return prev
 
+func reset_node(node: NodeAstar):
+    if(node):
+        node.reset_values()
+
 func find_path(parameters: Dictionary):
-    node_grid.reset_values(null);
+    node_grid.reset_values(null)
+    # node_grid.foreach(reset_node)
     var start_position = parameters.start_position
     var end_position = parameters.end_position
 
@@ -57,9 +64,6 @@ func find_path(parameters: Dictionary):
             "tile": end_tile,
         })
 
-    # print("start x y = ", start_x, ", ", start_y )
-    # print("end x y = ", end_x, ", ", end_y )
-    
     #TODO: handle nodes for more than 1 scenario. Current implementation is for flying units only
     node_grid.set_value(start_node, start_node.x, start_node.y)
     node_grid.set_value(end_node, end_node.x, end_node.y)
@@ -73,7 +77,11 @@ func find_path(parameters: Dictionary):
         var current_node: NodeAstar = open_list.reduce(get_lowest_f_cost_node, null)
         
         if(current_node == end_node):
-            return PolarAstarUtils.calculate_path(current_node)
+            return null
+            var path = PolarAstarUtils.calculate_path(current_node)
+            start_node.queue_free()
+            end_node.queue_free()
+            return path
         
         open_list.erase(current_node)
         closed_list.append(current_node)
@@ -83,7 +91,6 @@ func find_path(parameters: Dictionary):
 
         var cached_current_node = node_grid.get_value(current_node.x, current_node.y)
         if(!cached_current_node):
-            print("current node was not cached ")
             node_grid.set_value(current_node, current_node.x, current_node.y)
         
         var neighbor_nodes = current_node.neighbors if current_node.neighbors else []
@@ -96,6 +103,7 @@ func find_path(parameters: Dictionary):
                     continue
                 var neighbor_node: NodeAstar = cached_neighbor_node if cached_neighbor_node else null
                 if(!neighbor_node):
+                    # print("new node astar")
                     neighbor_node = NodeAstar.new({
                         "tile": neighbor_tile,
                     })

@@ -1,3 +1,5 @@
+extends RefCounted
+
 const GridAstar = preload("./grid_astar.gd")
 
 var is_solid: bool = false

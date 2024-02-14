@@ -1,3 +1,5 @@
+extends RefCounted
+
 const Array2d = preload("./array2d.gd")
 const TileAstar = preload("./tile_astar.gd")
 # const PolarArray2d = preload("res://addons/PlatformerAStar/DataTypes/array2d.gd")

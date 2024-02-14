@@ -1,3 +1,5 @@
+extends RefCounted
+
 const NodeAstar = preload("./node_astar.gd")
 
 var metadata: Dictionary

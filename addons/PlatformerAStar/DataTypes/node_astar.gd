@@ -1,3 +1,5 @@
+extends RefCounted
+
 const TileAstar = preload("./tile_astar.gd")
 const NodeAstar = preload("./node_astar.gd")
 
@@ -20,3 +22,7 @@ var neighbors: Array[NodeAstar] = []
 
 func _init(properties):
     tile = properties.tile
+
+func reset_values():
+    g = 0
+    h = 0

@@ -43,6 +43,7 @@ static func calculate_path(path_end_node: NodeAstar) -> Array[PathfindingNode]:
     path.reverse()
     return path
 
+# get_neighbor Y is similar to Godot. -Y means up, +Y means down. This is because grid_scanner scans from top left to bottom right
 static func get_neighbors(tile: TileAstar, grid: GridAstar, character_config: Dictionary) -> Array[TileAstar]:
     #TODO: handle for different sized characters
     var neighbors: Array[TileAstar] = []
@@ -54,43 +55,47 @@ static func get_neighbors(tile: TileAstar, grid: GridAstar, character_config: Di
     var down_left_tile = grid.get_tile(tile.x - 1, tile.y - 1)
     var down_right_tile = grid.get_tile(tile.x + 1, tile.y - 1)
 
-    # category: Left
-    var left_tile = grid.get_tile(tile.x - 1, tile.y)
-    var is_left_tile_grounded = get_on_ground(left_tile, grid)
+    if(tile.x > 0):
+        # category: Left
+        var left_tile = grid.get_tile(tile.x - 1, tile.y)
+        var is_left_tile_grounded = get_on_ground(left_tile, grid)
 
-    # left - horizontal
-    if(tile.x - 1 >= 0 && (is_left_tile_grounded || is_flying)):
-        neighbors.append(left_tile)
-    
-    # left - down (slopes)
-    if(tile.y - 1 >= 0 && \
-        !left_tile.is_solid && \
-        (is_flying || down_left_tile.is_slope)
-    ):
-        neighbors.append(grid.get_tile(tile.x - 1, tile.y - 1))
-    
-    # left - up
-    if(tile.y + 1 < grid.y_tiles && is_flying && !up_tile.is_solid && !left_tile.is_solid):
-        neighbors.append(grid.get_tile(tile.x - 1, tile.y + 1))
+        # left - horizontal
+        if(tile.x - 1 >= 0 && (is_left_tile_grounded || is_flying)):
+            neighbors.append(left_tile)
+        
+        # left - up
+        if(tile.y - 1 >= 0 && \
+            !left_tile.is_solid && !up_tile.is_solid
+        ):
+            neighbors.append(grid.get_tile(tile.x - 1, tile.y - 1))
+        
+        # left - down (slope)
+        if(tile.y + 1 < grid.y_tiles && \
+            (is_flying || down_left_tile.is_slope) && \
+            !left_tile.is_solid):
+            neighbors.append(grid.get_tile(tile.x - 1, tile.y + 1))
 
-    # category: Right
-    var right_tile = grid.get_tile(tile.x + 1, tile.y)
-    var is_right_tile_grounded = get_on_ground(right_tile, grid)
+    if(tile.x < grid.x_tiles - 1):
+        # category: Right
+        var right_tile = grid.get_tile(tile.x + 1, tile.y)
+        var is_right_tile_grounded = get_on_ground(right_tile, grid)
 
-    # right - horizontal
-    if(tile.x + 1 >= 0 && (is_right_tile_grounded || is_flying)):
-        neighbors.append(right_tile)
-    
-    # right - down (slopes)
-    if(tile.y - 1 >= 0 && \
-        !right_tile.is_solid && \
-        (is_flying || down_right_tile.is_slope)
-    ):
-        neighbors.append(grid.get_tile(tile.x + 1, tile.y - 1))
-    
-    # right - up
-    if(tile.y + 1 < grid.y_tiles && !up_tile.is_solid):
-        neighbors.append(grid.get_tile(tile.x + 1, tile.y + 1))
+        # right - horizontal
+        if(tile.x + 1 >= 0 && (is_right_tile_grounded || is_flying)):
+            neighbors.append(right_tile)
+        
+        # right - up
+        if(tile.y - 1 >= 0 && \
+            !right_tile.is_solid && !up_tile.is_solid
+        ):
+            neighbors.append(grid.get_tile(tile.x + 1, tile.y - 1))
+        
+        # right - down (slopes)
+        if(tile.y + 1 < grid.y_tiles && \
+            (is_flying || down_right_tile.is_slope) && \
+            !right_tile.is_solid):
+            neighbors.append(grid.get_tile(tile.x + 1, tile.y + 1))
 
     # category - up & down
     if(is_flying && tile.y + 1 < grid.y_tiles):
