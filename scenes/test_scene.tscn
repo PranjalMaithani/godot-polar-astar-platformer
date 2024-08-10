@@ -515,9 +515,38 @@ unique_name_in_owner = true
 script = ExtResource("9_7335h")
 grid_scanner = NodePath("../../GridScanner")
 
-[node name="Timer" type="Timer" parent="Test agent/Pathfinding"]
+[node name="ThrottleTimer" type="Timer" parent="Test agent/Pathfinding"]
 unique_name_in_owner = true
-wait_time = 0.35
+autostart = true
+
+[node name="Test agent2" type="Node2D" parent="." node_paths=PackedStringArray("target_node")]
+position = Vector2(5, -81)
+script = ExtResource("7_3qqmp")
+target_node = NodePath("../Player")
+
+[node name="PathfindingVisual" type="Node2D" parent="Test agent2"]
+script = ExtResource("8_loqto")
+
+[node name="Pathfinding" type="Node" parent="Test agent2" node_paths=PackedStringArray("grid_scanner")]
+script = ExtResource("9_7335h")
+grid_scanner = NodePath("../../GridScanner")
+
+[node name="ThrottleTimer" type="Timer" parent="Test agent2/Pathfinding"]
+autostart = true
+
+[node name="Test agent3" type="Node2D" parent="." node_paths=PackedStringArray("target_node")]
+position = Vector2(315, 62)
+script = ExtResource("7_3qqmp")
+target_node = NodePath("../Player")
+
+[node name="PathfindingVisual" type="Node2D" parent="Test agent3"]
+script = ExtResource("8_loqto")
+
+[node name="Pathfinding" type="Node" parent="Test agent3" node_paths=PackedStringArray("grid_scanner")]
+script = ExtResource("9_7335h")
+grid_scanner = NodePath("../../GridScanner")
+
+[node name="ThrottleTimer" type="Timer" parent="Test agent3/Pathfinding"]
 autostart = true
 
 [node name="Target Node" type="Node2D" parent="."]

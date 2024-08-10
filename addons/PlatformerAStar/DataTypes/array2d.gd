@@ -27,8 +27,8 @@ func reset_values(reset_value):
         var column_array = []
         for y in grid_height:
             var previous_value = grid[x][y]
-            if(previous_value && previous_value.has_method("free")):
-                previous_value.free()
+            if(previous_value && previous_value.has_method("queue_free")):
+                previous_value.queue_free()
             grid[x][y] = reset_value;
 
 func foreach(method: Callable):

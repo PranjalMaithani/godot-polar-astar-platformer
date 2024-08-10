@@ -10,6 +10,10 @@ const PathfindingNode = preload("./DataTypes/pathfinding_node.gd")
 const GridScanner = preload("./grid_scanner.gd")
 
 @export var grid_scanner: GridScanner
+
+var is_throttled = false
+@onready var throttle_timer: Timer = %ThrottleTimer
+
 var grid: GridAstar
 var node_grid: Array2d
 var character_config: Dictionary = {
@@ -18,10 +22,16 @@ var character_config: Dictionary = {
     "size": Vector2(1,1)
 } #TODO: create character config resource class
 
+var path: Array[PathfindingNode] = []
+
+func enable_pathfinding():
+  is_throttled = false
+
 func _ready():
     await get_tree().create_timer(2).timeout
     grid = grid_scanner.get_pathfinding_grid()
     node_grid = Array2d.new(grid.x_tiles, grid.y_tiles)
+    throttle_timer.timeout.connect(enable_pathfinding)
 
 func get_lowest_f_cost_node(prev: NodeAstar, current: NodeAstar):
     if(prev == null):
@@ -30,13 +40,12 @@ func get_lowest_f_cost_node(prev: NodeAstar, current: NodeAstar):
         return current
     return prev
 
-func reset_node(node: NodeAstar):
-    if(node):
-        node.reset_values()
-
 func find_path(parameters: Dictionary):
+    if(is_throttled):
+      return
+
+    is_throttled = true
     node_grid.reset_values(null)
-    # node_grid.foreach(reset_node)
     var start_position = parameters.start_position
     var end_position = parameters.end_position
 
@@ -77,10 +86,10 @@ func find_path(parameters: Dictionary):
         var current_node: NodeAstar = open_list.reduce(get_lowest_f_cost_node, null)
         
         if(current_node == end_node):
-            return null
-            var path = PolarAstarUtils.calculate_path(current_node)
-            start_node.queue_free()
-            end_node.queue_free()
+            print("calc path called")
+            path = PolarAstarUtils.calculate_path(current_node)
+            # start_node.queue_free()
+            # end_node.queue_free()
             return path
         
         open_list.erase(current_node)
@@ -107,7 +116,8 @@ func find_path(parameters: Dictionary):
                     neighbor_node = NodeAstar.new({
                         "tile": neighbor_tile,
                     })
-                    node_grid.set_value(neighbor_node, neighbor_node.x, neighbor_node.y)
+                
+                node_grid.set_value(neighbor_node, neighbor_node.x, neighbor_node.y)
                 
                 current_node.neighbors.append(neighbor_node)
             neighbor_nodes = current_node.neighbors

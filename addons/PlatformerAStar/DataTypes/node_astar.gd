@@ -3,6 +3,7 @@ extends RefCounted
 const TileAstar = preload("./tile_astar.gd")
 const NodeAstar = preload("./node_astar.gd")
 
+var iteration_id
 var g: int = 0
 var h: int = 0
 var f: int:
