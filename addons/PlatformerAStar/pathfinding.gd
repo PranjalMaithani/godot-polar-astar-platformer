@@ -23,6 +23,7 @@ var character_config: Dictionary = {
 } #TODO: create character config resource class
 
 var path: Array[PathfindingNode] = []
+var is_initialized = false
 
 func enable_pathfinding():
   is_throttled = false
@@ -34,7 +35,7 @@ func set_node_for_tile(tile: TileAstar):
   node_grid.set_value(node, tile.x, tile.y)
 
 func _ready():
-    await get_tree().create_timer(3).timeout
+    await get_tree().create_timer(1).timeout
     grid = grid_scanner.get_pathfinding_grid()
     node_grid = Array2d.new(grid.x_tiles, grid.y_tiles)
     grid.grid_array2d.foreach(func(tile):
@@ -47,6 +48,7 @@ func _ready():
         node_grid.get_value(tile.x, tile.y).neighbors.append(node_grid.get_value(tile_neighbor.x, tile_neighbor.y))
     )
     throttle_timer.timeout.connect(enable_pathfinding)
+    is_initialized = true
 
 func get_lowest_f_cost_node(prev: NodeAstar, current: NodeAstar):
     if(prev == null):
@@ -56,11 +58,10 @@ func get_lowest_f_cost_node(prev: NodeAstar, current: NodeAstar):
     return prev
 
 func find_path(parameters: Dictionary):
-    if(is_throttled || !grid || !grid.get_is_intialized()):
+    if(!is_initialized || is_throttled):
       return
 
     is_throttled = true
-    node_grid.reset_values(null)
     var start_position = parameters.start_position
     var end_position = parameters.end_position
 
@@ -76,7 +77,7 @@ func find_path(parameters: Dictionary):
         return null
 
     var start_node = node_grid.get_value(start_x, start_y)
-    var end_node := grid.get_tile(end_x, end_y)
+    var end_node = node_grid.get_value(end_x, end_y)
 
     if(end_node.tile.is_solid):
         return null
