@@ -27,10 +27,25 @@ var path: Array[PathfindingNode] = []
 func enable_pathfinding():
   is_throttled = false
 
+func set_node_for_tile(tile: TileAstar):
+  var node = NodeAstar.new({
+    "tile": tile
+  })
+  node_grid.set_value(node, tile.x, tile.y)
+
 func _ready():
-    await get_tree().create_timer(2).timeout
+    await get_tree().create_timer(3).timeout
     grid = grid_scanner.get_pathfinding_grid()
     node_grid = Array2d.new(grid.x_tiles, grid.y_tiles)
+    grid.grid_array2d.foreach(func(tile):
+      set_node_for_tile(tile)
+    )
+    grid.grid_array2d.foreach(func(tile):
+      var tile_neighbors = tile.get_neighbors(character_config)
+      #TODO: check if there is a more optimized way to do this
+      for tile_neighbor in tile_neighbors:
+        node_grid.get_value(tile.x, tile.y).neighbors.append(node_grid.get_value(tile_neighbor.x, tile_neighbor.y))
+    )
     throttle_timer.timeout.connect(enable_pathfinding)
 
 func get_lowest_f_cost_node(prev: NodeAstar, current: NodeAstar):
@@ -41,7 +56,7 @@ func get_lowest_f_cost_node(prev: NodeAstar, current: NodeAstar):
     return prev
 
 func find_path(parameters: Dictionary):
-    if(is_throttled):
+    if(is_throttled || !grid || !grid.get_is_intialized()):
       return
 
     is_throttled = true
@@ -60,23 +75,16 @@ func find_path(parameters: Dictionary):
        end_x < 0 || end_y < 0 || end_x >= grid.x_tiles || end_y >= grid.y_tiles):
         return null
 
-    var start_tile = grid.get_tile(start_x, start_y)
-    var end_tile := grid.get_tile(end_x, end_y)
+    var start_node = node_grid.get_value(start_x, start_y)
+    var end_node := grid.get_tile(end_x, end_y)
 
-    if(end_tile.is_solid):
+    if(end_node.tile.is_solid):
         return null
- 
-    var start_node = NodeAstar.new({
-            "tile": start_tile
-        })
-    var end_node = NodeAstar.new({
-            "tile": end_tile,
-        })
 
     #TODO: handle nodes for more than 1 scenario. Current implementation is for flying units only
     node_grid.set_value(start_node, start_node.x, start_node.y)
     node_grid.set_value(end_node, end_node.x, end_node.y)
-    start_node.h = PolarAstarUtils.calculate_distance(start_tile, end_tile)
+    start_node.h = PolarAstarUtils.calculate_tile_distance(grid.cell_size, start_node.tile, end_node.tile)
     
     var open_list: Array[NodeAstar] = [start_node]
     var closed_list: Array[NodeAstar] = []
@@ -86,54 +94,26 @@ func find_path(parameters: Dictionary):
         var current_node: NodeAstar = open_list.reduce(get_lowest_f_cost_node, null)
         
         if(current_node == end_node):
-            print("calc path called")
             path = PolarAstarUtils.calculate_path(current_node)
-            # start_node.queue_free()
-            # end_node.queue_free()
             return path
         
         open_list.erase(current_node)
         closed_list.append(current_node)
         
         var current_tile := current_node.tile
-        var neighbor_tiles = current_tile.get_neighbors(grid, character_config)
-
-        var cached_current_node = node_grid.get_value(current_node.x, current_node.y)
-        if(!cached_current_node):
-            node_grid.set_value(current_node, current_node.x, current_node.y)
-        
-        var neighbor_nodes = current_node.neighbors if current_node.neighbors else []
-
-        # caching neighbor nodes
-        if(!neighbor_nodes):
-            for neighbor_tile in neighbor_tiles:
-                var cached_neighbor_node = node_grid.get_value(neighbor_tile.x, neighbor_tile.y)
-                if(closed_list.has(cached_neighbor_node)):
-                    continue
-                var neighbor_node: NodeAstar = cached_neighbor_node if cached_neighbor_node else null
-                if(!neighbor_node):
-                    # print("new node astar")
-                    neighbor_node = NodeAstar.new({
-                        "tile": neighbor_tile,
-                    })
-                
-                node_grid.set_value(neighbor_node, neighbor_node.x, neighbor_node.y)
-                
-                current_node.neighbors.append(neighbor_node)
-            neighbor_nodes = current_node.neighbors
-
+        var neighbor_nodes = current_node.neighbors
         for neighbor_node in neighbor_nodes:
             if(neighbor_node.tile.is_solid && !neighbor_node.tile.is_slope):
                 continue
             
             var is_in_open_list = open_list.has(neighbor_node)
             # checking if g cost is less when re-visiting this node
-            var cost_to_neighbor = current_node.g + PolarAstarUtils.calculate_distance(current_tile, neighbor_node.tile)
+            var cost_to_neighbor = current_node.g + PolarAstarUtils.calculate_tile_distance(grid.cell_size, current_tile, neighbor_node.tile)
             if(!is_in_open_list || cost_to_neighbor < neighbor_node.g):
                 neighbor_node.g = cost_to_neighbor
                 neighbor_node.previous_node = current_node
                 if(!is_in_open_list):
-                    neighbor_node.h = PolarAstarUtils.calculate_distance(neighbor_node.tile, end_tile)
+                    neighbor_node.h = PolarAstarUtils.calculate_tile_distance(grid.cell_size, neighbor_node.tile, end_node.tile)
                     open_list.append(neighbor_node)
                     
     return null

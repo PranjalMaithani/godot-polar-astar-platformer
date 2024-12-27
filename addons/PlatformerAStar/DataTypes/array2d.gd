@@ -4,13 +4,13 @@ var grid: Array = []
 var grid_width: int
 var grid_height: int
 
-func _init(grid_width, grid_height):
+func _init(grid_width, grid_height, init_value = null):
     self.grid_width = grid_width
     self.grid_height = grid_height
     for i in grid_width:
         var column_array = []
         for j in grid_height:
-            column_array.append(null)
+            column_array.append(init_value)
         grid.append(column_array)
 
 func set_value(value, x: int, y: int):

@@ -5,11 +5,21 @@ const PathfindingNode = preload("./DataTypes/pathfinding_node.gd")
 const TileAstar = preload("./DataTypes/tile_astar.gd")
 const GridAstar = preload("./DataTypes/grid_astar.gd")
 
+static func calculate_tile_distance(tile_size, first_tile: TileAstar, second_tile: TileAstar):
+  # return calculate_distance(first_tile, second_tile)
+  var x_distance = abs(first_tile.x - second_tile.x) / tile_size
+  var y_distance = abs(first_tile.y - second_tile.y) / tile_size
+  var lowest = min(x_distance, y_distance)
+  var highest = max(x_distance, y_distance)
+  var horizontal_moves_required = highest - lowest
+  return lowest * 14 + horizontal_moves_required * 10
+
 static func calculate_distance(first_tile: TileAstar, second_tile: TileAstar):
     # TODO: return distance considering fall/jump in mind
     var first_position = Vector2(first_tile.x, first_tile.y)
     var second_position = Vector2(second_tile.x, second_tile.y)
-    return first_position.distance_to(second_position)
+    var distance = first_position.distance_to(second_position);
+    return distance
 
 static func get_number_of_tiles(start_position: Vector2, end_position: Vector2, cell_size: float):
     var x_tiles := floor(abs(end_position.x - start_position.x)/cell_size)
@@ -50,10 +60,10 @@ static func get_neighbors(tile: TileAstar, grid: GridAstar, character_config: Di
     var is_flying = character_config.flying if character_config.get("flying") else false
     var is_grounded = get_on_ground(tile, grid)
 
-    var down_tile = grid.get_tile(tile.x, tile.y - 1)
-    var up_tile = grid.get_tile(tile.x, tile.y + 1)
-    var down_left_tile = grid.get_tile(tile.x - 1, tile.y - 1)
-    var down_right_tile = grid.get_tile(tile.x + 1, tile.y - 1)
+    var down_tile = grid.get_tile(tile.x, tile.y + 1)
+    var up_tile = grid.get_tile(tile.x, tile.y - 1)
+    var down_left_tile = grid.get_tile(tile.x - 1, tile.y + 1)
+    var down_right_tile = grid.get_tile(tile.x + 1, tile.y + 1)
 
     if(tile.x > 0):
         # category: Left

@@ -517,6 +517,7 @@ grid_scanner = NodePath("../../GridScanner")
 
 [node name="ThrottleTimer" type="Timer" parent="Test agent/Pathfinding"]
 unique_name_in_owner = true
+wait_time = 0.145
 autostart = true
 
 [node name="Test agent2" type="Node2D" parent="." node_paths=PackedStringArray("target_node")]

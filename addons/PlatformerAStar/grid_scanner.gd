@@ -29,6 +29,8 @@ const GridAstar = preload("./DataTypes/grid_astar.gd")
 @export var grid_color: Color = Color(0.45, 0.45, 0.45, 1.0) : set = _set_grid_color 
 @export var grid_solid_color: Color = Color(0.0, 1.0, 0.0, 0.2) : set = _set_grid_solid_color
 
+signal scanning_done
+
 var is_scanned: bool
 var grid : GridAstar
 
@@ -154,8 +156,6 @@ func scan_grid():
             var shape_hit = direct_space_state.get_rest_info(shape_parameters)
 
             var is_solid = shape_hit.size() > 0
-            # if(is_solid):
-            #     print("found solid at ", tile_center, " for  XY = ", x, ", ", y)
             var is_slope = false
             var tile_properties = {
                 "is_solid": is_solid,
@@ -166,8 +166,14 @@ func scan_grid():
             }
             var tile: TileAstar = TileAstar.new(tile_properties)
             grid.set_tile(tile, x, y)
-    
+
+    grid.initialize_grid()
+    is_scanned = true
+    scanning_done.emit()
     queue_redraw()
 
 func get_pathfinding_grid() -> GridAstar:
     return grid
+
+func get_cell_size() -> float:
+    return cell_size

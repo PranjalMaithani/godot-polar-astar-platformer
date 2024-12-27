@@ -1,8 +1,6 @@
 extends Node2D
 class_name PolarPathFindingVisual
 
-const PathfindingNode = preload("./DataTypes/pathfinding_node.gd")
-
 var points_to_draw = []
 var should_draw_path: bool = false
 
