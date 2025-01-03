@@ -28,18 +28,15 @@ var is_initialized = false
 func enable_pathfinding():
   is_throttled = false
 
-func set_node_for_tile(tile: TileAstar):
-  var node = NodeAstar.new({
-    "tile": tile
-  })
-  node_grid.set_value(node, tile.x, tile.y)
-
 func _ready():
     await get_tree().create_timer(1).timeout
     grid = grid_scanner.get_pathfinding_grid()
     node_grid = Array2d.new(grid.x_tiles, grid.y_tiles)
     grid.grid_array2d.foreach(func(tile):
-      set_node_for_tile(tile)
+      var node = NodeAstar.new({
+        "tile": tile
+      })
+      node_grid.set_value(node, tile.x, tile.y)
     )
     grid.grid_array2d.foreach(func(tile):
       var tile_neighbors = tile.get_neighbors(character_config)
@@ -90,7 +87,7 @@ func find_path(parameters: Dictionary):
     var open_list: Array[NodeAstar] = [start_node]
     var closed_list: Array[NodeAstar] = []
 
-    while (open_list.size() > 0):
+    while (open_list.size() > 0):        
         # get lowest F cost node and mark it as current
         var current_node: NodeAstar = open_list.reduce(get_lowest_f_cost_node, null)
         
@@ -104,6 +101,8 @@ func find_path(parameters: Dictionary):
         var current_tile := current_node.tile
         var neighbor_nodes = current_node.neighbors
         for neighbor_node in neighbor_nodes:
+            if(closed_list.has(neighbor_node)):
+                continue
             if(neighbor_node.tile.is_solid && !neighbor_node.tile.is_slope):
                 continue
             
