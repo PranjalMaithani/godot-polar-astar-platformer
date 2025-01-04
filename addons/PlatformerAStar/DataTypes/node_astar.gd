@@ -4,8 +4,8 @@ const TileAstar = preload("./tile_astar.gd")
 const NodeAstar = preload("./node_astar.gd")
 
 var iteration_id
-var g: int = 0
-var h: int = 0
+var g: int
+var h: int
 var f: int:
     get: return g + h
 var tile: TileAstar
@@ -23,7 +23,3 @@ var neighbors: Array[NodeAstar] = []
 
 func _init(properties):
     tile = properties.tile
-
-func reset_values():
-    g = 0
-    h = 0

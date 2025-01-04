@@ -6,20 +6,12 @@ const TileAstar = preload("./DataTypes/tile_astar.gd")
 const GridAstar = preload("./DataTypes/grid_astar.gd")
 
 static func calculate_tile_distance(tile_size, first_tile: TileAstar, second_tile: TileAstar):
-  # return calculate_distance(first_tile, second_tile)
-  var x_distance = abs(first_tile.x - second_tile.x) / tile_size
-  var y_distance = abs(first_tile.y - second_tile.y) / tile_size
+  var x_distance = abs(first_tile.position.x - second_tile.position.x) / tile_size
+  var y_distance = abs(first_tile.position.y - second_tile.position.y) / tile_size
   var lowest = min(x_distance, y_distance)
   var highest = max(x_distance, y_distance)
   var horizontal_moves_required = highest - lowest
   return lowest * 14 + horizontal_moves_required * 10
-
-static func calculate_distance(first_tile: TileAstar, second_tile: TileAstar):
-    # TODO: return distance considering fall/jump in mind
-    var first_position = Vector2(first_tile.x, first_tile.y)
-    var second_position = Vector2(second_tile.x, second_tile.y)
-    var distance = first_position.distance_to(second_position);
-    return distance
 
 static func get_number_of_tiles(start_position: Vector2, end_position: Vector2, cell_size: float):
     var x_tiles := floor(abs(end_position.x - start_position.x)/cell_size)

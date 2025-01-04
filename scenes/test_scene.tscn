@@ -533,7 +533,7 @@ script = ExtResource("9_7335h")
 grid_scanner = NodePath("../../GridScanner")
 
 [node name="ThrottleTimer" type="Timer" parent="Test agent2/Pathfinding"]
-wait_time = 0.26
+wait_time = 1.256
 autostart = true
 
 [node name="Test agent3" type="Node2D" parent="." node_paths=PackedStringArray("target_node")]
