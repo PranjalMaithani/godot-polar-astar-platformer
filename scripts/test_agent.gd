@@ -1,7 +1,7 @@
 extends Node2D
 
 @export var target_node: Node2D
-@onready var pathfinding: PolarPathfinding = %Pathfinding
+@onready var pathfinding: PolarPathfinding = $Pathfinding
 @onready var pathfinding_visual: PolarPathFindingVisual = $PathfindingVisual
 
 var temp_bool = false

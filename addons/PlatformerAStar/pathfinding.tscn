@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://p03wcj3lyeup"]
+
+[ext_resource type="Script" path="res://addons/PlatformerAStar/pathfinding.gd" id="1_kiwld"]
+
+[node name="Pathfinding" type="Node" node_paths=PackedStringArray("grid_scanner")]
+script = ExtResource("1_kiwld")
+grid_scanner = NodePath("")
+
+[node name="ThrottleTimer" type="Timer" parent="."]
+wait_time = 0.4
+autostart = true

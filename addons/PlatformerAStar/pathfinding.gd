@@ -12,7 +12,7 @@ const GridScanner = preload("./grid_scanner.gd")
 @export var grid_scanner: GridScanner
 
 var is_throttled = false
-@onready var throttle_timer: Timer = %ThrottleTimer
+@onready var throttle_timer: Timer = $ThrottleTimer
 
 var grid: GridAstar
 var node_grid: Array2d
