@@ -29,6 +29,9 @@ const GridAstar = preload("./DataTypes/grid_astar.gd")
 @export var grid_color: Color = Color(0.45, 0.45, 0.45, 1.0) : set = _set_grid_color 
 @export var grid_solid_color: Color = Color(0.0, 1.0, 0.0, 0.2) : set = _set_grid_solid_color
 
+@export_group("Character Config")
+@export var character_config: PolarCharacterConfig
+
 signal scanning_done
 
 var is_scanned: bool
@@ -137,7 +140,7 @@ func scan_grid():
     var x_tiles = number_of_tiles.x
     var y_tiles = number_of_tiles.y
     var grid_origin = grid_bounds.start_position if tilemap else position
-    grid = GridAstar.new(x_tiles, y_tiles, cell_size, position)
+    grid = GridAstar.new(x_tiles, y_tiles, cell_size, position, character_config)
 
     var shape_parameters := PhysicsShapeQueryParameters2D.new()
     

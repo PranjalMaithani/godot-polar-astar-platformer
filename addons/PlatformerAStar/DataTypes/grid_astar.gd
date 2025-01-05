@@ -13,18 +13,15 @@ var is_initialized: bool = false
 
 var grid_array2d: Array2d
 #TODO: handle multiple character_configs
-var character_config: Dictionary = {
-  "name": "default",
-  "flying": true,
-  "size": Vector2(1,1)
-}
+var character_config: PolarCharacterConfig
 
 ## origin is at top left corner of the grid. The grid spans to the right and downwards
-func _init(x_tiles: int, y_tiles: int, cell_size: int, origin_position: Vector2):
+func _init(x_tiles: int, y_tiles: int, cell_size: int, origin_position: Vector2, character_config: PolarCharacterConfig):
   self.x_tiles = x_tiles
   self.y_tiles = y_tiles
   self.cell_size = cell_size
   self.origin_position = origin_position
+  self.character_config = character_config
   grid_array2d = Array2d.new(x_tiles, y_tiles)
 
 ## Sets the tiles neighbors and pathfinding schema

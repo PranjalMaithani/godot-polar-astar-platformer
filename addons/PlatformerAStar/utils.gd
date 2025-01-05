@@ -46,10 +46,10 @@ static func calculate_path(path_end_node: NodeAstar) -> Array[PathfindingNode]:
     return path
 
 # get_neighbor Y is similar to Godot. -Y means up, +Y means down. This is because grid_scanner scans from top left to bottom right
-static func get_neighbors(tile: TileAstar, grid: GridAstar, character_config: Dictionary) -> Array[TileAstar]:
+static func get_neighbors(tile: TileAstar, grid: GridAstar, character_config: PolarCharacterConfig) -> Array[TileAstar]:
     #TODO: handle for different sized characters
     var neighbors: Array[TileAstar] = []
-    var is_flying = character_config.flying if character_config.get("flying") else false
+    var is_flying = character_config.is_flying
     var is_grounded = get_on_ground(tile, grid)
 
     var down_tile = grid.get_tile(tile.x, tile.y + 1)

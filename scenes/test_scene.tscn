@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=4 uid="uid://byycst3o22hhh"]
+[gd_scene load_steps=13 format=4 uid="uid://byycst3o22hhh"]
 
 [ext_resource type="Texture2D" uid="uid://dxdyrhvhpcntr" path="res://assets/marble_packed.png" id="1_0e1uf"]
 [ext_resource type="PackedScene" uid="uid://vakib76awba7" path="res://entities/player.tscn" id="2_bgpue"]
@@ -8,7 +8,8 @@
 [ext_resource type="Script" path="res://addons/test_plugin/test_grid.gd" id="6_hq160"]
 [ext_resource type="Script" path="res://scripts/test_agent.gd" id="7_3qqmp"]
 [ext_resource type="Script" path="res://addons/PlatformerAStar/draw_pathfinding.gd" id="8_loqto"]
-[ext_resource type="PackedScene" uid="uid://p03wcj3lyeup" path="res://addons/PlatformerAStar/pathfinding.tscn" id="9_64hno"]
+[ext_resource type="PackedScene" uid="uid://p03wcj3lyeup" path="res://addons/PlatformerAStar/Resources/pathfinding.tscn" id="9_64hno"]
+[ext_resource type="Resource" uid="uid://cidpif8o6rp6n" path="res://addons/PlatformerAStar/Resources/default_character_config.tres" id="10_dfhwr"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_lc7sn"]
 texture = ExtResource("1_0e1uf")
@@ -140,6 +141,7 @@ cell_size = 18.0
 cell_size_ratio = 0.7
 tile_layer = 1
 show_grid = true
+character_config = ExtResource("10_dfhwr")
 
 [node name="Player" parent="." instance=ExtResource("2_bgpue")]
 position = Vector2(172, 26)
@@ -164,10 +166,9 @@ position = Vector2(581, -11)
 texture_filter = 3
 texture = ExtResource("5_551cu")
 
-[node name="TEST_GRID_TOOL" type="Node2D" parent="." node_paths=PackedStringArray("tilemap")]
+[node name="TEST_GRID_TOOL" type="Node2D" parent="."]
 position = Vector2(120, -75)
 script = ExtResource("6_hq160")
-tilemap = NodePath("")
 tile_layer = 1
 
 [node name="Test agent" type="Node2D" parent="." node_paths=PackedStringArray("target_node")]
@@ -180,3 +181,4 @@ script = ExtResource("8_loqto")
 
 [node name="Pathfinding" parent="Test agent" node_paths=PackedStringArray("grid_scanner") instance=ExtResource("9_64hno")]
 grid_scanner = NodePath("../../GridScanner")
+character_config = ExtResource("10_dfhwr")

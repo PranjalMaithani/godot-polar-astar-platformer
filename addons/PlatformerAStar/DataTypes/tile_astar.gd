@@ -21,10 +21,10 @@ func _init(properties: Dictionary):
     x = properties.x
     y = properties.y
 
-func set_neighbors(grid: GridAstar, character_config: Dictionary):
+func set_neighbors(grid: GridAstar, character_config: PolarCharacterConfig):
   var updated_neighbors = PolarAstarUtils.get_neighbors(self, grid, character_config)
   neighbors_map[character_config.name] = updated_neighbors
   return updated_neighbors
 
-func get_neighbors(character_config: Dictionary):
+func get_neighbors(character_config: PolarCharacterConfig):
     return neighbors_map[character_config.name]

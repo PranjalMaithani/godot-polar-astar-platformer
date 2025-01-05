@@ -16,11 +16,7 @@ var is_throttled = false
 
 var grid: GridAstar
 var node_grid: Array2d
-var character_config: Dictionary = {
-    "name": "default",
-    "flying": true,
-    "size": Vector2(1,1)
-} #TODO: create character config resource class
+@export var character_config: PolarCharacterConfig
 
 var path: Array[PathfindingNode] = []
 var is_initialized = false
