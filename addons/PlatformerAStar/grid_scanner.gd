@@ -7,7 +7,7 @@ const GridAstar = preload("./DataTypes/grid_astar.gd")
 
 @export_group("Tilemap")
 ## Specify only if you are using the Godot Tilemap
-@export var tilemap: TileMap
+@export var tilemap: TileMapLayer
 ## tilemap layers to check for custom data
 @export var tilemap_layer : int = 0
 
