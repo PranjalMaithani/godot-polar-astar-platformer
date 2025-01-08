@@ -87,6 +87,14 @@ func find_path(parameters: Dictionary):
         # get lowest F cost node and mark it as current
         var current_node: NodeAstar = open_list.reduce(get_lowest_f_cost_node, null)
         
+        if(character_config.size.x > 1 || character_config.size.y > 1):
+          var current_direction_x = 1 if end_node.x - current_node.x >= 0 else -1
+          var width_end = character_config.size.x + current_direction_x * current_node.tile.x
+          var height_end = character_config.size.y + current_node.tile.y
+          if(end_node.tile.x <= width_end && end_node.tile.y <= height_end):
+            path = PolarAstarUtils.calculate_path(current_node)
+            return path
+            
         if(current_node == end_node):
             path = PolarAstarUtils.calculate_path(current_node)
             return path
