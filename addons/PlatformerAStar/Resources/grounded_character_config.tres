@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="PolarCharacterConfig" load_steps=2 format=3 uid="uid://d2ikmwa2h5y06"]
+
+[ext_resource type="Script" path="res://addons/PlatformerAStar/DataTypes/character_config.gd" id="1_1m8fi"]
+
+[resource]
+script = ExtResource("1_1m8fi")
+name = "default"
+is_flying = false
+size = Vector2(1, 1)

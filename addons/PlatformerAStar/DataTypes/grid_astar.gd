@@ -12,7 +12,6 @@ var origin_position: Vector2
 var is_initialized: bool = false
 
 var grid_array2d: Array2d
-#TODO: handle multiple character_configs
 var character_config: PolarCharacterConfig
 
 ## origin is at top left corner of the grid. The grid spans to the right and downwards
