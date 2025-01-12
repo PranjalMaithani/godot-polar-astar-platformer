@@ -157,12 +157,14 @@ func scan_grid():
             rectangle_shape.size = Vector2(cell_size * cell_size_ratio, cell_size * cell_size_ratio)
             shape_parameters.shape = rectangle_shape
             var shape_hit = direct_space_state.get_rest_info(shape_parameters)
+            #TODO: check how do get this for non-tilemap
+            var cell_data = tilemap.get_cell_tile_data(tilemap.local_to_map(tile_center))
 
             var is_solid = shape_hit.size() > 0
-            var is_slope = false
+            var is_slope = cell_data.get_custom_data("is_slope") if !!cell_data else false
             var tile_properties = {
                 "is_solid": is_solid,
-                "is_slope": is_slope,
+                "is_slope": is_slope || false,
                 "position": tile_center,
                 "x": x,
                 "y": y,

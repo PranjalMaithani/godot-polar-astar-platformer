@@ -120,7 +120,7 @@ tile_size = Vector2i(18, 18)
 physics_layer_0/collision_layer = 1
 physics_layer_1/collision_layer = 2
 physics_layer_1/collision_mask = 2
-custom_data_layer_0/name = "isSlope"
+custom_data_layer_0/name = "is_slope"
 custom_data_layer_0/type = 1
 sources/1 = SubResource("TileSetAtlasSource_lc7sn")
 
