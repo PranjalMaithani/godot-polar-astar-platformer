@@ -32,6 +32,9 @@ const GridAstar = preload("./DataTypes/grid_astar.gd")
 @export_group("Character Config")
 @export var character_config: PolarCharacterConfig
 
+@export_group("Character Configs")
+@export var character_configs: Array[PolarCharacterConfig]
+
 signal scanning_done
 
 var is_scanned: bool

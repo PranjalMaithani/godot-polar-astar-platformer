@@ -172,7 +172,7 @@ script = ExtResource("6_hq160")
 tile_layer = 1
 
 [node name="Test agent" type="Node2D" parent="." node_paths=PackedStringArray("target_node")]
-position = Vector2(336, -81)
+position = Vector2(336, 62)
 script = ExtResource("7_3qqmp")
 target_node = NodePath("../Player")
 

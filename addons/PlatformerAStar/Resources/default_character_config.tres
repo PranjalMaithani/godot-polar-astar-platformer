@@ -5,5 +5,5 @@
 [resource]
 script = ExtResource("1_1r8tu")
 name = "default"
-is_flying = true
+is_flying = false
 size = Vector2(1, 1)
